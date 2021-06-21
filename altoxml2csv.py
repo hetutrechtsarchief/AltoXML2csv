@@ -15,7 +15,7 @@ for filename in sys.argv[1:]:
     xml = ET.fromstring(xmlstring) 
     items = []
 
-    image = filename.replace("_alto.xml",".jpg").rpartition("/")[-1]
+    image = filename.replace("_alto.xml",".jpg").rpartition("/")[-1] # extract image filename without path
 
     imageWidth = xml.find(".//Page").attrib["WIDTH"]
     imageHeight = xml.find(".//Page").attrib["HEIGHT"]
@@ -32,7 +32,7 @@ for filename in sys.argv[1:]:
 
       text = textline.attrib["CONTENT"]
      
-      item["text"] = text   #text.text if text!=None else ""
+      item["text"] = text
 
       item["x"] = int(textline.attrib["HPOS"])
       item["y"] = int(textline.attrib["VPOS"])
