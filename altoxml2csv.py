@@ -2,9 +2,8 @@
 import sys,csv,argparse,codecs,re
 import xml.etree.ElementTree as ET 
 
-tags = []
-
-writer = csv.DictWriter(sys.stdout, fieldnames=["image","imageWidth","imageHeight","id","text","x","y","width","height","confidence"], quoting=csv.QUOTE_NONNUMERIC)
+columns = ["image","imageWidth","imageHeight","id","text","x","y","width","height","confidence"]
+writer = csv.DictWriter(sys.stdout, fieldnames=columns, quoting=csv.QUOTE_NONNUMERIC)
 writer.writeheader()
 
 for filename in sys.argv[1:]:
@@ -13,27 +12,19 @@ for filename in sys.argv[1:]:
     xmlstring = file.read()
     xmlstring = re.sub(r'\sxmlns="[^"]+"', '', xmlstring, count=1)
     xml = ET.fromstring(xmlstring) 
-    items = []
-
+    
     image = filename.replace("_alto.xml",".jpg").rpartition("/")[-1] # extract image filename without path
-
-    imageWidth = xml.find(".//Page").attrib["WIDTH"]
-    imageHeight = xml.find(".//Page").attrib["HEIGHT"]
+    imageWidth = int(xml.find(".//Page").attrib["WIDTH"])
+    imageHeight = int(xml.find(".//Page").attrib["HEIGHT"])
 
     for textline in xml.findall('.//TextLine/String'): # recursive findall with XPath to also allow TextLines within tables
 
       item = {}
-
       item["id"] = ""
-
       item["image"] = image
-      item["imageWidth"] = int(imageWidth)
-      item["imageHeight"] = int(imageHeight)
-
-      text = textline.attrib["CONTENT"]
-     
-      item["text"] = text
-
+      item["imageWidth"] = imageWidth
+      item["imageHeight"] = imageHeight
+      item["text"] = textline.attrib["CONTENT"]
       item["x"] = int(textline.attrib["HPOS"])
       item["y"] = int(textline.attrib["VPOS"])
       item["width"] = int(textline.attrib["WIDTH"])
